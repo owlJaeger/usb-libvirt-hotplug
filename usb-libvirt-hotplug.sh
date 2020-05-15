@@ -23,12 +23,6 @@ if [ ! -t 1 ]; then
   exec >&${COPROC[1]} 2>&1
 fi
 
-DOMAIN="$1"
-if [ -z "${DOMAIN}" ]; then
-  echo "Missing libvirt domain parameter for ${PROG}." >&2
-  exit 1
-fi
-
 
 #
 # Do some sanity checking of the udev environment variables.
@@ -98,8 +92,26 @@ DEVNUM=$((10#$DEVNUM))
 # Run the appropriate virsh-command, and ask it to read the
 # update XML from stdin.
 #
-echo "Running virsh ${COMMAND} ${DOMAIN} for USB bus=${BUSNUM} device=${DEVNUM}:" >&2
-virsh "${COMMAND}" "${DOMAIN}" /dev/stdin <<END
+echo "Running virsh ${COMMAND} windows for USB bus=${BUSNUM} device=${DEVNUM}:" >&2
+virsh "${COMMAND}" "windows" /dev/stdin <<END
+<hostdev mode='subsystem' type='usb'>
+  <source>
+    <address bus='${BUSNUM}' device='${DEVNUM}' />
+  </source>
+</hostdev>
+END
+
+echo "Running virsh ${COMMAND} ubuntu for USB bus=${BUSNUM} device=${DEVNUM}:" >&2
+virsh "${COMMAND}" "ubuntu" /dev/stdin <<END
+<hostdev mode='subsystem' type='usb'>
+  <source>
+    <address bus='${BUSNUM}' device='${DEVNUM}' />
+  </source>
+</hostdev>
+END
+
+echo "Running virsh ${COMMAND} macOS for USB bus=${BUSNUM} device=${DEVNUM}:" >&2
+virsh "${COMMAND}" "macOS" /dev/stdin <<END
 <hostdev mode='subsystem' type='usb'>
   <source>
     <address bus='${BUSNUM}' device='${DEVNUM}' />
