@@ -87,34 +87,25 @@ fi
 BUSNUM=$((10#$BUSNUM))
 DEVNUM=$((10#$DEVNUM))
 
+
+cat > /tmp/deviceFile <<- END
+<hostdev mode='subsystem' type='usb'>
+  <source>
+    <address bus='${BUSNUM}' device='${DEVNUM}' />
+  </source>
+</hostdev>
+END
+
 #
 # Now we have all the information we need to update the VM.
 # Run the appropriate virsh-command, and ask it to read the
 # update XML from stdin.
 #
 echo "Running virsh ${COMMAND} windows for USB bus=${BUSNUM} device=${DEVNUM}:" >&2
-virsh "${COMMAND}" "windows" /dev/stdin <<END
-<hostdev mode='subsystem' type='usb'>
-  <source>
-    <address bus='${BUSNUM}' device='${DEVNUM}' />
-  </source>
-</hostdev>
-END
+virsh "${COMMAND}" "windows" --file /tmp/deviceFile --current
 
 echo "Running virsh ${COMMAND} ubuntu for USB bus=${BUSNUM} device=${DEVNUM}:" >&2
-virsh "${COMMAND}" "ubuntu" /dev/stdin <<END
-<hostdev mode='subsystem' type='usb'>
-  <source>
-    <address bus='${BUSNUM}' device='${DEVNUM}' />
-  </source>
-</hostdev>
-END
+virsh "${COMMAND}" "ubuntu" --file /tmp/deviceFile --current
 
 echo "Running virsh ${COMMAND} macOS for USB bus=${BUSNUM} device=${DEVNUM}:" >&2
-virsh "${COMMAND}" "macOS" /dev/stdin <<END
-<hostdev mode='subsystem' type='usb'>
-  <source>
-    <address bus='${BUSNUM}' device='${DEVNUM}' />
-  </source>
-</hostdev>
-END
+virsh "${COMMAND}" "macOS" --file /tmp/deviceFile --current
